@@ -1,0 +1,13 @@
+Purpose - process dbf files with speed, perform user defined jobs on them
+
+Task one - filesystem operations, open and close.
+Task two - read header
+Task three - read fields
+
+Architecture
+    FPCnv
+        - container for all info about the dbf
+        - hands out chunks of work.
+    FPProcessor
+        - receives a chunk of bytes to process - raw bytes in n * recorsize chunks
+        - processes each record...
