@@ -4,6 +4,8 @@ Task one - filesystem operations, open and close.
 Task two - read header
 Task three - read fields
 
+Minimum Bytes for file == Hdr(32) + one Fld(32) + FldTerm 0x0D(1) + Backlink info(263) = 328 + at least 1 record size
+
 Architecture
     FPCnv
         - container for all info about the dbf
