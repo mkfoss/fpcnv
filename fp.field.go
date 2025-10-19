@@ -1,4 +1,5 @@
 package fpcnv
 
-type Field struct {
+type Field interface {
+	DbfType() FieldType
 }
