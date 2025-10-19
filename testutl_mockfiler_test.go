@@ -8,7 +8,7 @@ import (
 
 //type MockStat struct {
 //	Mname      string
-//	size       int64
+//	Size       int64
 //	Mmode      os.FileMode
 //	MmodTime   time.Time
 //	MisDir     bool
@@ -24,7 +24,7 @@ import (
 //	if ms.sizeMocked {
 //		return ms.mockSize
 //	}
-//	return ms.size
+//	return ms.Size
 //}
 //
 //func (ms *MockStat) Mode() fs.FileMode {

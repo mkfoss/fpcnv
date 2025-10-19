@@ -46,7 +46,7 @@ func readHeader(f FPFiler) (*Header, error) {
 	if err != nil {
 		return nil, err
 	}
-	//todo: do some sanity checking with file size here
+	//todo: do some sanity checking with file Size here
 	_, err = f.Seek(16, io.SeekCurrent)
 	if err != nil {
 		return nil, NewError("could not seek past header reserved block 12-27").SetWrapped(err)
@@ -139,11 +139,11 @@ func readHdrRecordOffset(f FPFiler) (uint16, error) {
 
 	b, err := readUint16(f)
 	if err != nil {
-		return 0, NewError("failed to read offset").SetWrapped(err)
+		return 0, NewError("failed to read Offset").SetWrapped(err)
 	}
 
 	if b < 33 {
-		return 0, NewErrorf("invalid record offset").SetWrapped(nil)
+		return 0, NewErrorf("invalid record Offset").SetWrapped(nil)
 	}
 
 	return b, nil
@@ -153,11 +153,11 @@ func readHdrRecordSize(f FPFiler) (uint16, error) {
 
 	b, err := readUint16(f)
 	if err != nil {
-		return 0, NewError("failed to read record size").SetWrapped(err)
+		return 0, NewError("failed to read record Size").SetWrapped(err)
 	}
 
 	if b < 2 {
-		return 0, NewErrorf("invalid record size").SetWrapped(nil)
+		return 0, NewErrorf("invalid record Size").SetWrapped(nil)
 	}
 
 	return b, nil
@@ -167,7 +167,7 @@ func readHdrTableFlags(f FPFiler) (bool, bool, error) {
 
 	var b byte
 	if err := binary.Read(f, binary.LittleEndian, &b); err != nil {
-		return false, false, NewError("failed to read flags").SetWrapped(err)
+		return false, false, NewError("failed to read Flags").SetWrapped(err)
 	}
 
 	if b&0x04 == 0x04 {
@@ -175,7 +175,7 @@ func readHdrTableFlags(f FPFiler) (bool, bool, error) {
 	}
 
 	if b > 7 {
-		return false, false, NewErrorf("invalid table flags").SetWrapped(nil)
+		return false, false, NewErrorf("invalid table Flags").SetWrapped(nil)
 	}
 
 	return b&0x01 == 0x01, b&0x02 == 0x02, nil

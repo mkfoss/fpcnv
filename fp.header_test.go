@@ -196,8 +196,8 @@ func Test_ReadRecOffset(t *testing.T) {
 
 	cases := []testType{
 		{1, []byte{0x0c, 0x10}, uint16(4108), ""},
-		{2, []byte{0x00, 0x00}, uint16(0), "invalid record offset"},
-		{3, []byte{0x01, 0x00}, uint16(0), "invalid record offset"},
+		{2, []byte{0x00, 0x00}, uint16(0), "invalid record Offset"},
+		{3, []byte{0x01, 0x00}, uint16(0), "invalid record Offset"},
 	}
 
 	for _, tc := range cases {
@@ -231,8 +231,8 @@ func Test_ReadRecordSize(t *testing.T) {
 	}
 	cases := []testType{
 		{1, []byte{0x0c, 0x10}, uint16(4108), ""},
-		{2, []byte{0x00, 0x00}, uint16(0), "invalid record size"},
-		{3, []byte{0x01, 0x00}, uint16(0), "invalid record size"},
+		{2, []byte{0x00, 0x00}, uint16(0), "invalid record Size"},
+		{3, []byte{0x01, 0x00}, uint16(0), "invalid record Size"},
 		{3, []byte{0x02, 0x00}, uint16(2), ""},
 	}
 	for _, tc := range cases {
@@ -275,7 +275,7 @@ func Test_ReadTableFlags(t *testing.T) {
 		{6, 5, true, false, "fp databases not supported"},
 		{7, 6, false, true, "fp databases not supported"},
 		{8, 7, true, true, "fp databases not supported"},
-		{9, 8, false, false, "invalid table flags"},
+		{9, 8, false, false, "invalid table Flags"},
 	}
 
 	for _, tc := range cases {
