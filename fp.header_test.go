@@ -335,3 +335,81 @@ func Test_ReadCodepage(t *testing.T) {
 		})
 	}
 }
+
+func Test_ReadHeader(t *testing.T) {
+
+	type testType struct {
+		id       int
+		input    []byte
+		expected *Header
+		error    string
+	}
+
+	cases := []testType{
+		{1,
+			[]byte{0x30, 0x19, 0x09, 0x19, 0x0C, 0x10, 0x00, 0x00, 0x88, 0x04, 0xD6, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00},
+			&Header{
+				Magic:         0x30,
+				LastUpdate:    time.Date(2025, time.Month(9), 25, 0, 0, 0, 0, time.Local),
+				RecordCount:   4108,
+				RecordSize:    726,
+				RecordsOffset: 1160,
+				HasIndex:      true,
+				HasFpt:        false,
+				IsDatabase:    false,
+				Codepage:      Codepage(0x03),
+			},
+			"",
+		},
+		{2,
+			[]byte{0x30, 0x19, 0x09, 0x1A, 0x4D, 0x76, 0x91, 0x00, 0x28, 0x03, 0x61, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32, 0xD8, 0xED, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00},
+			&Header{
+				Magic:         0x30,
+				LastUpdate:    time.Date(2025, time.Month(9), 26, 0, 0, 0, 0, time.Local),
+				RecordCount:   9533005,
+				RecordSize:    97,
+				RecordsOffset: 808,
+				HasIndex:      true,
+				HasFpt:        false,
+				IsDatabase:    false,
+				Codepage:      Codepage(0x03),
+			},
+			"",
+		},
+		{3,
+			[]byte{0x30, 0x19, 0x0A, 0x10, 0xCE, 0x00, 0x00, 0x00, 0xA8, 0x01, 0x5B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x00, 0x00},
+			&Header{
+				Magic:         0x30,
+				LastUpdate:    time.Date(2025, time.Month(10), 16, 0, 0, 0, 0, time.Local),
+				RecordCount:   206,
+				RecordSize:    91,
+				RecordsOffset: 424,
+				HasIndex:      true,
+				HasFpt:        false,
+				IsDatabase:    false,
+				Codepage:      Codepage(0x03),
+			},
+			"",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("Read Header #%.2d", tc.id), func(t *testing.T) {
+			fl := NewMockFiler()
+			fl.Data = tc.input
+
+			hdr, err := readHeader(fl)
+			if tc.error != "" {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				assert.ErrorContains(t, err, tc.error)
+			} else {
+				if err != nil {
+					t.Fatal(err, "no error expected")
+				}
+				assert.Equal(t, tc.expected, hdr)
+			}
+		})
+	}
+}

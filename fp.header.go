@@ -2,6 +2,7 @@ package fpcnv
 
 import (
 	"encoding/binary"
+	"io"
 	"slices"
 	"time"
 )
@@ -22,7 +23,48 @@ var mbsupported = []byte{0x30}
 
 func readHeader(f FPFiler) (*Header, error) {
 
-	return nil, NewError("not implemented")
+	hdr := Header{}
+
+	var err error
+	hdr.Magic, err = readHdrMagicByte(f)
+	if err != nil {
+		return nil, err
+	}
+	hdr.LastUpdate, err = readHdrLastUpdate(f)
+	if err != nil {
+		return nil, err
+	}
+	hdr.RecordCount, err = readHdrNumRecords(f)
+	if err != nil {
+		return nil, err
+	}
+	hdr.RecordsOffset, err = readHdrRecordOffset(f)
+	if err != nil {
+		return nil, err
+	}
+	hdr.RecordSize, err = readHdrRecordSize(f)
+	if err != nil {
+		return nil, err
+	}
+	//todo: do some sanity checking with file size here
+	_, err = f.Seek(16, io.SeekCurrent)
+	if err != nil {
+		return nil, NewError("could not seek past header reserved block 12-27").SetWrapped(err)
+	}
+	hdr.HasIndex, hdr.HasFpt, err = readHdrTableFlags(f)
+	if err != nil {
+		return nil, err
+	}
+	hdr.Codepage, err = readHdrCodepage(f)
+	if err != nil {
+		return nil, err
+	}
+	_, err = f.Seek(3, io.SeekCurrent)
+	if err != nil {
+		return nil, NewError("could not seek header reserved block 30-31").SetWrapped(err)
+	}
+	//todo: read fields
+	return &hdr, nil
 }
 
 func readHdrMagicByte(f FPFiler) (byte, error) {
@@ -144,6 +186,10 @@ func readHdrCodepage(f FPFiler) (Codepage, error) {
 	var b uint8
 	if err := binary.Read(f, binary.LittleEndian, &b); err != nil {
 		return 0, NewError("failed to read codepage").SetWrapped(err)
+	}
+
+	if b == 0x00 { //todo: check this.  the unverified assumption is 0x00 is local codepage, so use ansi as default
+		b = 0x03
 	}
 
 	if !slices.Contains(supportedCodepages, Codepage(b)) {
