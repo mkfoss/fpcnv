@@ -5,20 +5,7 @@ import (
 	"encoding/binary"
 )
 
-type Fielder interface {
-	Name() string
-	DbfType() FieldType
-	Offset() uint32
-	Size() uint8
-	Decimals() uint8
-	System() bool
-	Nullable() bool
-	Binary() bool
-	Value() any
-	String() string
-}
-
-type BaseField struct {
+type Field struct {
 	name     string
 	dbft     FieldType
 	offset   uint32
@@ -39,13 +26,14 @@ type fieldReadStruct struct {
 	Reserved1 [13]byte
 }
 
-func ReadField(filer FPFiler) (*BaseField, error) {
+func readField(filer FPFiler) (*Field, error) {
 	bf := fieldReadStruct{}
 	err := binary.Read(filer, binary.LittleEndian, &bf)
 	if err != nil {
 		return nil, NewError("reading field information").SetWrapped(err)
 	}
-	return &BaseField{
+
+	return &Field{
 		name:     string(bytes.ToLower(bytes.Trim(bf.Name[:], string([]byte{0x00})))),
 		dbft:     FieldTypeFromByte(bf.Dbft),
 		offset:   bf.Offset,
@@ -57,44 +45,34 @@ func ReadField(filer FPFiler) (*BaseField, error) {
 	}, nil
 }
 
-func (bf *BaseField) Name() string {
+func (bf *Field) Name() string {
 	return bf.name
 }
 
-func (bf *BaseField) DbfType() FieldType {
+func (bf *Field) DbfType() FieldType {
 	return bf.dbft
 }
 
-func (bf *BaseField) Offset() uint32 {
+func (bf *Field) Offset() uint32 {
 	return bf.offset
 }
 
-func (bf *BaseField) Size() uint8 {
+func (bf *Field) Size() uint8 {
 	return bf.size
 }
 
-func (bf *BaseField) Decimals() uint8 {
+func (bf *Field) Decimals() uint8 {
 	return bf.decimals
 }
 
-func (bf *BaseField) System() bool {
+func (bf *Field) System() bool {
 	return bf.system
 }
 
-func (bf *BaseField) Nullable() bool {
+func (bf *Field) Nullable() bool {
 	return bf.nullable
 }
 
-func (bf *BaseField) Binary() bool {
+func (bf *Field) Binary() bool {
 	return bf.Binary()
-}
-
-type Fields struct {
-	fields   []Fielder
-	fieldmap map[string]int
-}
-
-func ReadFields(filer FPFiler) (*Fields, error) {
-
-	return nil, NewError("not implemented")
 }

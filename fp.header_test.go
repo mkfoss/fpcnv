@@ -310,7 +310,7 @@ func Test_ReadCodepage(t *testing.T) {
 
 	cases := []testType{
 		{1, 0x03, Codepage(0x03), ""},
-		{2, 0x00, Codepage(0x00), "unsupported codepage 0x00"},
+		{2, 0x00, Codepage(0x03), ""},
 		{3, 0xff, Codepage(0x00), "unsupported codepage 0xff"},
 		{3, 0x4b, Codepage(0x00), "unsupported codepage 0x4b"},
 	}

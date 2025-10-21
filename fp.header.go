@@ -49,7 +49,7 @@ func readHeader(f FPFiler) (*Header, error) {
 	//todo: do some sanity checking with file Size here
 	_, err = f.Seek(16, io.SeekCurrent)
 	if err != nil {
-		return nil, NewError("could not seek past header reserved block 12-27").SetWrapped(err)
+		return nil, NewError("could not seek past Header reserved block 12-27").SetWrapped(err)
 	}
 	hdr.HasIndex, hdr.HasFpt, err = readHdrTableFlags(f)
 	if err != nil {
@@ -59,11 +59,11 @@ func readHeader(f FPFiler) (*Header, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = f.Seek(3, io.SeekCurrent)
+	_, err = f.Seek(2, io.SeekCurrent) //seek past reserved
 	if err != nil {
-		return nil, NewError("could not seek header reserved block 30-31").SetWrapped(err)
+		return nil, NewError("could not seek Header reserved block 30-31").SetWrapped(err)
 	}
-	//todo: read fields
+	//todo: read Fields
 	return &hdr, nil
 }
 
@@ -188,7 +188,7 @@ func readHdrCodepage(f FPFiler) (Codepage, error) {
 		return 0, NewError("failed to read codepage").SetWrapped(err)
 	}
 
-	if b == 0x00 { //todo: check this.  the unverified assumption is 0x00 is local codepage, so use ansi as default
+	if b == 0x00 { //todo: check this.  the unverified assumption is 0x00 is windows1252 - ansi as default
 		b = 0x03
 	}
 
