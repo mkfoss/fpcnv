@@ -12,6 +12,7 @@ type FPCnv struct {
 }
 
 func (cnv *FPCnv) Open(filename string) error {
+
 	return cnv.OpenWithOpener(filename, &OsOpener{})
 }
 
@@ -54,6 +55,22 @@ func (cnv *FPCnv) Close() error {
 	if err != nil {
 		return NewErrorf("failed to close fp file").SetWrapped(err)
 	}
+	cnv.file = nil
+	return nil
+}
 
+func (cnv *FPCnv) Active() bool {
+
+	return cnv.file != nil
+}
+
+func (cnv *FPCnv) InitializeProcessor(processor RecordProcessor) error {
+	if !cnv.Active() {
+		return NewErrorf("cannot process records if no file is open")
+	}
+	err := processor.Initialize(cnv.file, cnv.Header, cnv.Fields)
+	if err != nil {
+		return NewErrorf("failed to initialize processor").SetWrapped(err)
+	}
 	return nil
 }
