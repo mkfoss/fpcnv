@@ -33,7 +33,7 @@ func Test_ReadFields(t *testing.T) {
 			fl := NewMockFiler()
 			fl.Data = tc.input
 
-			flds, err := readFields(fl, len(tc.expected))
+			flds, err := ReadFields(fl, len(tc.expected))
 			if tc.err != "" {
 				if err == nil {
 					t.Fatalf("ReadFields(%d) expected error: %s", tc.id, tc.err)

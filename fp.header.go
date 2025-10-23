@@ -21,7 +21,7 @@ type Header struct {
 
 var mbsupported = []byte{0x30}
 
-func readHeader(f FPFiler) (*Header, error) {
+func ReadHeader(f io.Reader) (*Header, error) {
 
 	hdr := Header{}
 
@@ -47,7 +47,8 @@ func readHeader(f FPFiler) (*Header, error) {
 		return nil, err
 	}
 	//todo: do some sanity checking with file Size here
-	_, err = f.Seek(16, io.SeekCurrent)
+	seekb := make([]byte, 16)
+	_, err = f.Read(seekb)
 	if err != nil {
 		return nil, NewError("could not seek past Header reserved block 12-27").SetWrapped(err)
 	}
@@ -59,7 +60,8 @@ func readHeader(f FPFiler) (*Header, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = f.Seek(2, io.SeekCurrent) //seek past reserved
+	seekb = make([]byte, 2)
+	_, err = f.Read(seekb) //seek past reserved
 	if err != nil {
 		return nil, NewError("could not seek Header reserved block 30-31").SetWrapped(err)
 	}
@@ -67,7 +69,7 @@ func readHeader(f FPFiler) (*Header, error) {
 	return &hdr, nil
 }
 
-func readHdrMagicByte(f FPFiler) (byte, error) {
+func readHdrMagicByte(f io.Reader) (byte, error) {
 	var b byte
 	if err := binary.Read(f, binary.LittleEndian, &b); err != nil {
 		return 0, NewError("failed to read magic byte").SetWrapped(err)
@@ -80,7 +82,7 @@ func readHdrMagicByte(f FPFiler) (byte, error) {
 	return b, nil
 }
 
-func readHdrLastUpdate(f FPFiler) (time.Time, error) {
+func readHdrLastUpdate(f io.Reader) (time.Time, error) {
 
 	b := make([]byte, 3)
 	if err := binary.Read(f, binary.LittleEndian, &b); err != nil {
@@ -111,7 +113,7 @@ func readHdrLastUpdate(f FPFiler) (time.Time, error) {
 	return time.Date(yr, time.Month(b[1]), int(b[2]), 0, 0, 0, 0, time.Local), nil //time for dbf files always local
 }
 
-func readHdrNumRecords(f FPFiler) (uint32, error) {
+func readHdrNumRecords(f io.Reader) (uint32, error) {
 
 	var b uint32
 	err := binary.Read(f, binary.LittleEndian, &b)
@@ -124,7 +126,7 @@ func readHdrNumRecords(f FPFiler) (uint32, error) {
 	return b, nil
 }
 
-func readUint16(f FPFiler) (uint16, error) {
+func readUint16(f io.Reader) (uint16, error) {
 
 	var b uint16
 	err := binary.Read(f, binary.LittleEndian, &b)
@@ -135,7 +137,7 @@ func readUint16(f FPFiler) (uint16, error) {
 	return b, nil
 }
 
-func readHdrRecordOffset(f FPFiler) (uint16, error) {
+func readHdrRecordOffset(f io.Reader) (uint16, error) {
 
 	b, err := readUint16(f)
 	if err != nil {
@@ -149,7 +151,7 @@ func readHdrRecordOffset(f FPFiler) (uint16, error) {
 	return b, nil
 }
 
-func readHdrRecordSize(f FPFiler) (uint16, error) {
+func readHdrRecordSize(f io.Reader) (uint16, error) {
 
 	b, err := readUint16(f)
 	if err != nil {
@@ -163,7 +165,7 @@ func readHdrRecordSize(f FPFiler) (uint16, error) {
 	return b, nil
 }
 
-func readHdrTableFlags(f FPFiler) (bool, bool, error) {
+func readHdrTableFlags(f io.Reader) (bool, bool, error) {
 
 	var b byte
 	if err := binary.Read(f, binary.LittleEndian, &b); err != nil {
@@ -181,7 +183,7 @@ func readHdrTableFlags(f FPFiler) (bool, bool, error) {
 	return b&0x01 == 0x01, b&0x02 == 0x02, nil
 }
 
-func readHdrCodepage(f FPFiler) (Codepage, error) {
+func readHdrCodepage(f io.Reader) (Codepage, error) {
 
 	var b uint8
 	if err := binary.Read(f, binary.LittleEndian, &b); err != nil {

@@ -398,7 +398,7 @@ func Test_ReadHeader(t *testing.T) {
 			fl := NewMockFiler()
 			fl.Data = tc.input
 
-			hdr, err := readHeader(fl)
+			hdr, err := ReadHeader(fl)
 			if tc.error != "" {
 				if err == nil {
 					t.Fatal("expected error, got nil")

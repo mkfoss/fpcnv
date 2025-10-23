@@ -3,6 +3,7 @@ package fpcnv
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 )
 
 type Field struct {
@@ -26,9 +27,9 @@ type fieldReadStruct struct {
 	Reserved1 [13]byte
 }
 
-func readField(filer FPFiler) (*Field, error) {
+func readField(rdr io.Reader) (*Field, error) {
 	bf := fieldReadStruct{}
-	err := binary.Read(filer, binary.LittleEndian, &bf)
+	err := binary.Read(rdr, binary.LittleEndian, &bf)
 	if err != nil {
 		return nil, NewError("reading field information").SetWrapped(err)
 	}

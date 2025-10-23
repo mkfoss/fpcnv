@@ -1,12 +1,14 @@
 package fpcnv
 
+import "io"
+
 type Fields struct {
 	fields   []*Field
 	fieldmap map[string]int
 }
 
 // ReadFields reads the Fields from the file data - filer must be positioned correctly.
-func readFields(filer FPFiler, expected int) (*Fields, error) {
+func ReadFields(rdr io.Reader, expected int) (*Fields, error) {
 
 	flds := &Fields{
 		fields:   make([]*Field, expected),
@@ -16,7 +18,7 @@ func readFields(filer FPFiler, expected int) (*Fields, error) {
 	var curroffset uint32 = 1 //offset starts at 1 - deleted marker
 
 	for x := range expected {
-		fld, err := readField(filer)
+		fld, err := readField(rdr)
 		if err != nil {
 			return nil, NewErrorf("reading field %d of %d", x, expected).SetWrapped(err)
 		}
@@ -30,8 +32,8 @@ func readFields(filer FPFiler, expected int) (*Fields, error) {
 		flds.fieldmap[fld.name] = x
 	}
 
-	var b []byte = make([]byte, 1)
-	n, err := filer.Read(b)
+	var b = make([]byte, 1)
+	n, err := rdr.Read(b)
 	if err != nil {
 		return nil, NewError("reading end of Fields marker").SetWrapped(err)
 	}
